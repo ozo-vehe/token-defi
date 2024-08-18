@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { supply } from '../utils/supply';
 import { useEthersProvider, useEthersSigner } from '../utils/ethers';
+import { tokens } from "../utils/tokens";
 
 const SupplyToPool: React.FC = () => {
   const [amount, setAmount] = useState("");
@@ -62,7 +63,7 @@ const SupplyToPool: React.FC = () => {
         <h2 className="text-2xl font-bold mb-4 text-gray-800">Supply to AAVE Pool</h2>
         <div className="mb-4">
           <label htmlFor="tokenAddress" className="block text-sm font-medium text-gray-700 mb-1">
-            Token Address
+            Token
           </label>
           <select
             value={token}
@@ -70,8 +71,9 @@ const SupplyToPool: React.FC = () => {
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 border py-3 px-2 outline-none"
           >
             <option value="">Select a token</option>
-            <option value="USDC">USDC</option>
-            <option value="LINK">LINK</option>
+            {Object.keys(tokens).map((tokenName, index) => (
+              <option key={index} value={tokens[tokenName].symbol}>{tokens[tokenName].symbol}</option>
+            ))}
           </select>
         </div>
         <div className="mb-4">

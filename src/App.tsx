@@ -5,6 +5,7 @@ import WalletDetails from './components/WalletDetails';
 import Swap from './components/Swap';
 import SupplyToPool from "./components/SupplyToPool";
 import Pool from "./components/Pool";
+import YieldFarming from './components/YieldFarming';
 
 function App() {
   // const account = useAccount();
@@ -20,6 +21,7 @@ function App() {
       {link == "swap" && <Swap />}
       {link == "supply" && <SupplyToPool />}
       {link == "pool" && <Pool />}
+      {link == "yield farming" && <YieldFarming />}
     </>
   )
 }

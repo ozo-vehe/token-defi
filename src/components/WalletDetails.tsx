@@ -3,10 +3,17 @@ import { useAccount, useBalance } from 'wagmi'
 import { getBalance } from '../utils';
 import { useEthersSigner } from "../utils/ethers.ts";
 
+// interface Token {
+//   name: string | undefined;
+//   balance: string | number | undefined;
+//   symbol: string | undefined;
+// }
 interface Token {
   name: string | undefined;
-  balance: string | number | undefined;
-  symbol: string | undefined;
+  symbol: string;
+  address: string | undefined;
+  decimal: number;
+  balance: number | string
 }
 
 const WalletDetails: React.FC = () => {
@@ -14,37 +21,22 @@ const WalletDetails: React.FC = () => {
   const { address, isConnected, chain } = useAccount();
   const { data: balance } = useBalance({ address });
 
-  // const LINK_TOKEN_ADDRESS = "0xf8fb3713d459d7c1018bd0a49d19b4c44290ebe5";
   const signer = useEthersSigner();
-  // const provider = useEthersProvider();
+  
   const getAccountDetails = async () => {
-    const { link, usdc } = await getBalance(signer);
-    console.log("Link: ");
+    const availableTokens = await getBalance(signer);
 
     const sepoliaToken: Token = {
       name: chain?.name,
       balance: Number(balance?.formatted).toFixed(2),
-      symbol: "sETH"
+      symbol: "sETH",
+      address: undefined,
+      decimal: 6,
     }
-
-    const linkToken: Token = {
-      name: "Chainlink",
-      balance: Number(link).toFixed(2),
-      symbol: "LINK"
-    }
-
-    const usdcToken: Token = {
-      name: "USDC",
-      balance: Number(usdc).toFixed(2),
-      symbol: "USDC"
-    }
-    console.log("Sepolia eth: ")
-    console.log(balance?.formatted)
 
     setTokens((tokens) => (
-      tokens = [sepoliaToken, linkToken, usdcToken]
+      tokens = [sepoliaToken, ...availableTokens]
     ))
-    console.log(tokens)
   }
 
 

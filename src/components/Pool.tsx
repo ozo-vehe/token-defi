@@ -1,32 +1,32 @@
 import { FC, useEffect, useState } from 'react'
 import { getPoolData } from '../utils';
 import { useEthersSigner, useEthersProvider } from "../utils/ethers";
-// import { Token } from '../types/Token'
-
-// interface PoolProps {
-//   tokens: Token[]
-//   onWithdraw: (tokenId: string) => void
-// }
-interface Token {
-  id: string | undefined;
-  name: string | undefined;
-  balance: string | undefined;
-  symbol: string | undefined;
-}
+import { Token, tokens } from '../utils/tokens';
+import { withdraw } from '../utils/withdraw';
+import { getTokensArr } from '../utils';
 
 const Pool: FC = () => {
-  const [tokens, setTokens] = useState<Token[]>([]);
+  const [aaveTokens, setAaveTokens] = useState<Token[]>([]);
+  const [tokensArr, setTokensArr] = useState<Token[]>([]);
+  const [withdrawalComplete, setWithdrawalComplete] = useState(false);
+  const [transactionHash, setTransactionHash] = useState("");
+  const [withdrawing, setWithdrawing] = useState("");
 
   const signer = useEthersSigner();
   const provider = useEthersProvider();
+  console.log("=============  SIGNER  ===================")
+  console.log(signer)
 
-  const handleWithdraw = async (tokenId: string | undefined) => {
-    if (tokenId) {
+  const handleWithdraw = async (aToken: Token) => {
+    if (aToken) {
+      setWithdrawing(aToken.name);
+      const aTokenIndex = aaveTokens.indexOf(aToken);
+      const token = tokensArr[aTokenIndex];
       try {
-        console.log(`Withdrawing ${tokenId}`);
-        const poolData = await getPoolData(signer, provider);
-        // console.log(poolData);
-        setTokens(poolData);
+        console.log(`Withdrawing ${token.name}`);
+        const txHash = await withdraw(aToken.balance, signer, provider, token);
+        setTransactionHash(txHash);
+        setWithdrawing("");
       } catch (error: any) {
         console.log(error);
       }
@@ -34,8 +34,13 @@ const Pool: FC = () => {
   }
   const getUserPoolData = async () => {
     try {
-      const poolData = await getPoolData(signer, provider);
-      setTokens(poolData);
+      console.log("Getting pool data");
+      const poolData = await getPoolData(signer);
+      const tokensArr = await getTokensArr();
+
+      setTokensArr(tokensArr);
+
+      setAaveTokens(poolData);
     } catch (error: any) {
       console.log(error);
     }
@@ -47,6 +52,31 @@ const Pool: FC = () => {
 
   return (
     <div className="flex items-center justify-center text-sm min-h-[90vh] bg-gray-100">
+      {withdrawalComplete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-gray-50 text-sm rounded-lg p-6 max-w-[600px]">
+            <h3 className="text-xl font-bold mb-4">Swap Complete</h3>
+            <p className="mb-4">Your swap has been successfully completed.</p>
+            <p className="mb-4">
+              Transaction Hash:{' '}
+              <a
+                href={`https://sepolia.etherscan.io/tx/${transactionHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-green-700 hover:text-green-800"
+              >
+                {transactionHash}
+              </a>
+            </p>
+            <button
+              onClick={() => setWithdrawalComplete(false)}
+              className="bg-green-700 hover:bg-green-800 text-white py-2 px-4 rounded"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
       <div className="p-8 bg-white rounded-lg shadow-md min-w-[400px]">
         <h2 className="text-2xl font-bold mb-4">Funding Pool</h2>
         <table className="w-full border-collapse">
@@ -58,16 +88,25 @@ const Pool: FC = () => {
             </tr>
           </thead>
           <tbody>
-            {tokens.map((token) => (
-              <tr key={token.id} className="border-b">
-                <td className="py-2 pl-4">{token.symbol}</td>
-                <td className="py-2 text-center">{Number(token.balance).toFixed(2)}</td>
+            {aaveTokens.length <= 0 && (
+              <tr className="relative text-center justify-center h-12">
+                <p className="absolute left-[50%] animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-gray-500 mt-4"></p>
+              </tr>
+            )}
+            {aaveTokens.map((_token, _i) => (
+              <tr key={_i} className="border-b">
+                <td className="py-2 pl-4">{_token.symbol}</td>
+                <td className="py-2 text-center">{Number(_token.balance).toFixed(2)}</td>
                 <td className="py-2 text-right">
                   <button
-                    onClick={() => handleWithdraw(token.id)}
-                    className="bg-[#dda432] hover:bg-[#ba8a2a] text-white py-1 px-3 rounded"
+                    onClick={() => handleWithdraw(_token)}
+                    className="bg-[#dda432] hover:bg-[#ba8a2a] text-white py-1 px-3 w-full h-[30px] flex items-center justify-center rounded"
                   >
-                    withdraw
+                    {withdrawing == _token.name ? (
+                      <span className="inline-block ml-2 animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-gray-200"></span>
+                    ) : (
+                      "withdraw"
+                    )}
                   </button>
                 </td>
               </tr>

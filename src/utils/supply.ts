@@ -3,11 +3,10 @@ import PoolAddressesProviderABI from "../abis/PoolAddressesProvider.json";
 import LINK_TOKEN_ABI from "../abis/link.json";
 import AAVE_POOL_ABI from "../abis/aavepool.json";
 import TOKEN_IN_ABI from "../abis/token.json";
+import {tokens} from "./tokens";
 
 // Constants
 const POOL_ADDRESSES_PROVIDER_ADDRESS = "0x012bAC54348C0E635dCAc9D5FB99f06F24136C9A";
-const LINK_TOKEN_ADDRESS = "0xf8fb3713d459d7c1018bd0a49d19b4c44290ebe5";
-const USDC_TOKEN_ADDRESS = "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8";
 
 // Amount to deposit and withdraw
 // const amount = ethers.parseUnits("0.1", 18);
@@ -110,10 +109,10 @@ export const supply = async (amount: string, signer: any, provider: any, token: 
   const tokenDecimal: number = token == "USDC" ? 6 : 18;
 
   if (token == "USDC") {
-    const txHash = await supplyToken(USDC_TOKEN_ADDRESS, TOKEN_IN_ABI, tokenDecimal, amount, provider, signer);
+    const txHash = await supplyToken(tokens.usdcToken.address, TOKEN_IN_ABI, tokenDecimal, amount, provider, signer);
     return txHash;
   } else {
-    const txHash = await supplyToken(LINK_TOKEN_ADDRESS, LINK_TOKEN_ABI, tokenDecimal, amount, provider, signer);
+    const txHash = await supplyToken(tokens.chainlinkToken.address, LINK_TOKEN_ABI, tokenDecimal, amount, provider, signer);
     return txHash;
   }
 }

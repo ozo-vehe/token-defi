@@ -14,7 +14,7 @@ const Navbar: React.FC<NavbarProps> = ({ setLink }) => {
   const { address, isConnected } = useAccount();
   const [isOpen, setIsOpen] = useState(false);
 
-  const links = ["wallet details", "swap", "supply", "pool"]
+  const links = ["wallet details", "swap", "supply", "pool", "yield farming"]
 
   useEffect(() => {
     if (!isConnected) {

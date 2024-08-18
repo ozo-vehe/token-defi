@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import {swap} from "../utils/swap";
 import { useEthersSigner, useEthersProvider } from "../utils/ethers.ts";
+import {tokens} from "../utils/tokens";
 
 const Swap: React.FC = () => {
   const [fromToken, setFromToken] = useState('')
@@ -59,7 +60,7 @@ const Swap: React.FC = () => {
       )}
 
       <div className="bg-white shadow-md rounded-lg p-6 min-w-[400px]">
-        <h2 className="text-2xl font-bold mb-4">Swap Tokens</h2>
+        <h2 className="text-2xl font-bold mb-4">Swap Tokens (on Uniswap)</h2>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">From</label>
@@ -69,8 +70,9 @@ const Swap: React.FC = () => {
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 border py-3 px-2 outline-none"
             >
               <option value="">Select a token</option>
-              <option value="USDC">USDC</option>
-              <option value="LINK">LINK</option>
+              {Object.keys(tokens).map((tokenName, index) => (
+                <option key={index} value={tokens[tokenName].symbol}>{tokens[tokenName].symbol}</option>
+              ))}
             </select>
           </div>
           <div>
@@ -81,8 +83,9 @@ const Swap: React.FC = () => {
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200 focus:ring-opacity-50 border py-3 px-2 outline-none"
             >
               <option value="">Select a token</option>
-              <option value="USDC">USDC</option>
-              <option value="LINK">LINK</option>
+              {Object.keys(tokens).map((tokenName, index) => (
+                <option key={index} value={tokens[tokenName].symbol}>{tokens[tokenName].symbol}</option>
+              ))}
             </select>
           </div>
           <div>
