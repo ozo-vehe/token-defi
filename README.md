@@ -28,7 +28,7 @@ The primary objective of this project is to illustrate how DeFi protocols can be
 
 ## Diagram Illustration
 
-![Flowchart](diagram.png) <!-- Ensure the image is properly linked -->
+![Flowchart](https://github.com/ozo-vehe/token-defi/blob/main/download.png) <!-- Ensure the image is properly linked -->
 
 The diagram above illustrates the entire process flow, starting from connecting the wallet, performing a token swap on Uniswap, and finally supplying the swapped tokens to Aave’s lending pool.
 
