@@ -38,9 +38,7 @@ const WalletDetails: React.FC = () => {
       wrapped: false,
     }
 
-    setTokens((tokens) => (
-      tokens = [sepoliaToken, ...availableTokens]
-    ))
+    setTokens([sepoliaToken, ...availableTokens])
   }
 
 
