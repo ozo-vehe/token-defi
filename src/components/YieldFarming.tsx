@@ -1,25 +1,25 @@
-import { useState, FC } from 'react'
-import { supply } from '../utils/supply';
-import { useEthersProvider, useEthersSigner } from '../utils/ethers';
-import { tokens } from "../utils/tokens"
+import { FC } from 'react'
+// import { supply } from '../utils/supply';
+// import { useEthersProvider, useEthersSigner } from '../utils/ethers';
+// import { tokens } from "../utils/tokens"
 
 const YieldFarming: FC = () => {
-  const [amount, setAmount] = useState("");
-  const [token, setToken] = useState("");
-  const [supplying, setSupplying] = useState(false);
-  const [supplyingComplete, setSupplyingComplete] = useState(false);
-  const [transactionHash, setTransactionHash] = useState("");
+  // const [amount, setAmount] = useState("");
+  // const [token, setToken] = useState("");
+  // const [supplying, setSupplying] = useState(false);
+  // const [supplyingComplete, setSupplyingComplete] = useState(false);
+  // const [transactionHash, setTransactionHash] = useState("");
 
   // const signer = useEthersSigner();
   // const provider = useEthersProvider();
 
-  const handleSupply = async () => {
-    console.log(token)
-  }
+  // const handleSupply = async () => {
+  //   console.log(token)
+  // }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      {supplyingComplete && (
+      {/* {supplyingComplete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-gray-50 text-sm rounded-lg p-6 max-w-[600px]">
             <h3 className="text-xl font-bold mb-4">Supply Complete</h3>
@@ -43,7 +43,7 @@ const YieldFarming: FC = () => {
             </button>
           </div>
         </div>
-      )}
+      )} */}
 
       <div>
         <p>Coming soon...</p>

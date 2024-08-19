@@ -3,22 +3,22 @@ import { useAccount, useBalance } from 'wagmi'
 import { getBalance } from '../utils';
 import { useEthersSigner } from "../utils/ethers.ts";
 
-// interface Token {
-//   name: string | undefined;
-//   balance: string | number | undefined;
-//   symbol: string | undefined;
-// }
 interface Token {
   name: string | undefined;
   symbol: string;
   address: string | undefined;
   decimal: number;
-  balance: number | string
+  balance: string | undefined;
+  chainId: number | undefined;
+  isToken: boolean;
+  isNative: boolean;
+  wrapped: boolean;
 }
+
 
 const WalletDetails: React.FC = () => {
   const [tokens, setTokens] = useState<Token[]>([]);
-  const { address, isConnected, chain } = useAccount();
+  const { address, isConnected, chain, chainId } = useAccount();
   const { data: balance } = useBalance({ address });
 
   const signer = useEthersSigner();
@@ -32,6 +32,10 @@ const WalletDetails: React.FC = () => {
       symbol: "sETH",
       address: undefined,
       decimal: 6,
+      chainId: chainId,
+      isToken: true,
+      isNative: true,
+      wrapped: false,
     }
 
     setTokens((tokens) => (
