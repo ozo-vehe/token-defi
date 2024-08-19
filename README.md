@@ -4,6 +4,9 @@
 
 This project demonstration the composability and integration of decentralized finance (DeFi) protocols. The scripts written in this project focuses on two major DeFi platforms: Uniswap and Aave. By leveraging Uniswap for token swapping and Aave for lending, the script showcases a streamlined workflow that allows users to convert tokens(USDC, LINK, DAI, WETH) on Uniswap and immediately utilize the token gotten in Aave’s lending pool to earn interest.
 
+### Review
+Code is deployed at [Token Defi](https://token-defi-tkkb.vercel.app/) for review. Scripts with the functionalities are located in the `utils` folder.
+
 ## Functionalities
 
 ### 1. **Swapping on Uniswap**
@@ -49,7 +52,7 @@ The diagram above illustrates the entire process flow, starting from connecting 
 ### 3. **Viewing Supply Pool**
    - code can be found in `utils/index.ts`
    - **Supply Balance Query**:
-     - The script interacts with Aave’s `getUserReserveData` function to retrieve the current amount of a specific token (in this case, LINK) that has been supplied to the Aave pool by the user. This provides real-time information on the user’s balance within the Aave lending pool.
+     - The script uses `balanceOf` function to retrieve the current amount of a specific token that has been supplied to the Aave pool by the user. This provides real-time information on the user’s balance within the Aave lending pool.
 
 ### 4. **Withdraw from Aave**
    - code can be found in `utils/withdraw.ts`
