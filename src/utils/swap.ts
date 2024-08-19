@@ -3,19 +3,20 @@ import FACTORY_ABI from "../abis/factory.json";
 import SWAP_ROUTER_ABI from "../abis/swaprouter.json";
 import POOL_ABI from "../abis/pool.json";
 import TOKEN_IN_ABI from "../abis/token.json";
+import { Token } from "./tokens";
+import { tokenBalance } from ".";
 
-const SWAP_ROUTER_CONTRACT_ADDRESS = "0x3bFA4769FB09eefC5a80d6E87c3B9C650f7Ae48E";
-const LINK_TOKEN_ADDRESS = "0xf8fb3713d459d7c1018bd0a49d19b4c44290ebe5";
-const USDC_TOKEN_ADDRESS = "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8";
 const POOL_FACTORY_CONTRACT_ADDRESS = "0x0227628f3F023bb0B980b67D528571c95c6DaC1c";
+const SWAP_ROUTER_CONTRACT_ADDRESS = "0x3bFA4769FB09eefC5a80d6E87c3B9C650f7Ae48E";
 
-async function approveToken(tokenAddress: string, tokenABI: any, amount: string | number, wallet: any) {
+//Part B - Write Approve Token Function
+const approveToken = async(tokenAddress: string, tokenABI: any, amount: bigint, wallet: any) => {
   try {
     const tokenContract = new ethers.Contract(tokenAddress, tokenABI, wallet);
-    const approveAmount = ethers.parseUnits(amount.toString(), 6);
+    // const approveAmount = ethers.parseUnits(amount.toString(), LINK.decimals);
     const approveTransaction = await tokenContract.approve.populateTransaction(
       SWAP_ROUTER_CONTRACT_ADDRESS,
-      approveAmount
+      amount
     );
     const transactionResponse = await wallet.sendTransaction(
       approveTransaction
@@ -29,7 +30,6 @@ async function approveToken(tokenAddress: string, tokenABI: any, amount: string 
     console.log(
       `Approval Transaction Confirmed! https://sepolia.etherscan.io/tx/${receipt.hash}`
     );
-    // return receipt.hash;
   } catch (error) {
     console.error("An error occurred during token approval:", error);
     throw new Error("Token approval failed");
@@ -37,10 +37,10 @@ async function approveToken(tokenAddress: string, tokenABI: any, amount: string 
 }
 
 //Part C - Write Get Pool Info Function
-async function getPoolInfo(factoryContract:any, tokenInAddress: string, tokenOutAddress: string, provider: any) {
+const getPoolInfo = async(factoryContract: any, tokenIn: Token, tokenOut: Token, provider: any) => {
   const poolAddress = await factoryContract.getPool(
-    tokenInAddress,
-    tokenOutAddress,
+    tokenIn.address,
+    tokenOut.address,
     3000
   );
   if (!poolAddress) {
@@ -56,10 +56,10 @@ async function getPoolInfo(factoryContract:any, tokenInAddress: string, tokenOut
 }
 
 //Part D - Write Prepare Swap Params Function
-async function prepareSwapParams(poolContract: any, signer: any, amountIn: BigInt, tokenInAddress: string, tokenOutAddress: string) {
+const prepareSwapParams = async(poolContract: any, signer: any, amountIn: bigint, tokenIn: Token, tokenOut: Token) => {
   return {
-    tokenIn: tokenInAddress,
-    tokenOut: tokenOutAddress,
+    tokenIn: tokenIn.address,
+    tokenOut: tokenOut.address,
     fee: await poolContract.fee(),
     recipient: signer.address,
     amountIn: amountIn,
@@ -69,34 +69,45 @@ async function prepareSwapParams(poolContract: any, signer: any, amountIn: BigIn
 }
 
 //Part E - Write Execute Swap Function
-async function executeSwap(swapRouter: any, params: Object, signer: any) {
+const executeSwap = async(swapRouter: any, params: any, signer: any) => {
   const transaction = await swapRouter.exactInputSingle.populateTransaction(
-    params
+    params,
+    {gasLimit: 300000}
   );
-  const receipt = await signer.sendTransaction(transaction);
-  console.log(`-------------------------------`);
-  console.log(`Receipt: https://sepolia.etherscan.io/tx/${receipt.hash}`);
-  console.log(`-------------------------------`);
-  return receipt.hash;
+  try {
+    const receipt = await signer.sendTransaction(transaction);
+    console.log(`-------------------------------`);
+    console.log(`Receipt: https://sepolia.etherscan.io/tx/${receipt.hash}`);
+    console.log(`-------------------------------`);
+
+    return receipt.hash;
+  } catch (error) {
+    throw new Error("Token swap failed");
+  }
 }
 
 //Part F - Write Main Function
-export const swap = async(swapAmount: string | number, signer: any, provider: any) => {
+export const swap = async(swapAmount: string, tokenIn: Token, tokenOut: Token, signer: any, provider: any) => {
   const inputAmount = swapAmount;
-  const amountIn = ethers.parseUnits(inputAmount.toString(), 6);
+  const amountIn = ethers.parseUnits(inputAmount.toString(), tokenIn.decimal);
   
+  const getTokenBalance = await tokenBalance(tokenIn.address, TOKEN_IN_ABI, signer, tokenIn.decimal);
+
+  if(Number(getTokenBalance) < 1) {
+    alert("No tokens available to swap, please select another pair for swapping...");
+    return;
+  }
+
   const factoryContract = new ethers.Contract(
     POOL_FACTORY_CONTRACT_ADDRESS,
     FACTORY_ABI,
-    signer
-  )
+    provider
+  );
 
   try {
-    await approveToken(USDC_TOKEN_ADDRESS, TOKEN_IN_ABI, inputAmount, signer);
-
-    const { poolContract } = await getPoolInfo(factoryContract, USDC_TOKEN_ADDRESS, LINK_TOKEN_ADDRESS, provider);
-
-    const params = await prepareSwapParams(poolContract, signer, amountIn, USDC_TOKEN_ADDRESS, LINK_TOKEN_ADDRESS);
+    await approveToken(tokenIn.address, TOKEN_IN_ABI, amountIn, signer);
+    const { poolContract } = await getPoolInfo(factoryContract, tokenIn, tokenOut, provider);
+    const params = await prepareSwapParams(poolContract, signer, amountIn, tokenIn, tokenOut);
 
     const swapRouter = new ethers.Contract(
       SWAP_ROUTER_CONTRACT_ADDRESS,
@@ -104,9 +115,10 @@ export const swap = async(swapAmount: string | number, signer: any, provider: an
       signer
     );
     const txHash = await executeSwap(swapRouter, params, signer);
-    return txHash;
 
+    return txHash;
   } catch (error: any) {
     console.error("An error occurred:", error.message);
+    throw new Error("Token swap failed");
   }
 }

@@ -2,17 +2,7 @@ import { ethers } from "ethers";
 import AAVE_POOL_ABI from "../abis/aavepool.json";
 import ERC20_ABI from "../abis/erc20.json";
 import {Token} from "./tokens";
-import { tokenBalance } from ".";
 import { getPoolAddress } from "./supply";
-
-
-
-const checkAaveTokenBalance = async (token: Token, signer: any) => {
-  const tokenBal = await tokenBalance(token.address, ERC20_ABI, signer, token.decimal);
-  const balance = Number(Number(tokenBal).toFixed(2));
-
-  return balance;
-}
 
 // Function to approve the Pool contract to withdraw token
 async function approveTokenWithdraw(tokenAddress: string, tokenABI: any, amount: BigInt, signer: any, poolAddress: string) {

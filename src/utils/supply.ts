@@ -1,22 +1,12 @@
 import { ethers } from "ethers";
 import PoolAddressesProviderABI from "../abis/PoolAddressesProvider.json";
-import LINK_TOKEN_ABI from "../abis/link.json";
 import AAVE_POOL_ABI from "../abis/aavepool.json";
 import TOKEN_IN_ABI from "../abis/token.json";
-import {tokens} from "./tokens";
+import { Token } from "./tokens";
+import { tokenBalance } from ".";
 
 // Constants
 const POOL_ADDRESSES_PROVIDER_ADDRESS = "0x012bAC54348C0E635dCAc9D5FB99f06F24136C9A";
-
-// Amount to deposit and withdraw
-// const amount = ethers.parseUnits("0.1", 18);
-
-async function checkApproval(tokenAddress: string, tokenABI: any, poolAddress: string, signer: any,) {
-  const tokenContract = new ethers.Contract(tokenAddress, tokenABI, signer);
-  const allowance = await tokenContract.allowance(signer.address, poolAddress);
-  console.log(`Current Allowance: ${ethers.formatUnits(allowance, 18)} LINK`);
-  return allowance;
-}
 
 // Function to get the Pool contract address
 export const getPoolAddress = async (provider: any) => {
@@ -39,7 +29,7 @@ export const getPoolAddress = async (provider: any) => {
 }
 
 // Function to approve the Pool contract to spend LINK tokens
-async function approveLinkToken(tokenAddress: string, tokenABI: any, amount: BigInt, signer: any, poolAddress: string) {
+const approveLinkToken = async(tokenAddress: string, tokenABI: any, amount: BigInt, signer: any, poolAddress: string) => {
   try {
     const tokenContract = new ethers.Contract(tokenAddress, tokenABI, signer);
 
@@ -56,10 +46,10 @@ async function approveLinkToken(tokenAddress: string, tokenABI: any, amount: Big
 }
 
 // Function to deposit token into Aave
-async function depositToAave(tokenAddress: string, poolAddress: string, amount: BigInt, signer: any) {
+const depositToAave = async(tokenAddress: string, poolAddress: string, amount: BigInt, signer: any) => {
   const aavePoolContract = new ethers.Contract(poolAddress, AAVE_POOL_ABI, signer);
 
-  console.log(`Depositing ${amount.toString()} LINK into Aave...`);
+  console.log(`Depositing ${amount.toString()} token into Aave...`);
   try {
     const depositTx = await aavePoolContract.supply(
       tokenAddress,
@@ -79,6 +69,17 @@ async function depositToAave(tokenAddress: string, poolAddress: string, amount: 
 
 const supplyToken = async (tokenAddress: string, tokenABI: any, tokenDecimal: number, amount: string, provider: any, signer: any) => {
   const amountIn = ethers.parseUnits(amount, tokenDecimal);
+  const getTokenBalance = await tokenBalance(tokenAddress, TOKEN_IN_ABI, signer, tokenDecimal)
+
+  console.log("Balance: ");
+  console.log(getTokenBalance);
+
+  if(Number(amount) > Number(getTokenBalance)) {
+    alert("Invalid amount entered...");
+    throw new Error("Invalid amount entered");
+  }
+
+
   try {
     // Get the Pool contract address from the PoolAddressesProvider
     const poolAddress = await getPoolAddress(provider);
@@ -86,9 +87,6 @@ const supplyToken = async (tokenAddress: string, tokenABI: any, tokenDecimal: nu
     console.log("Pool Address: ");
     console.log(poolAddress);
     console.log("------------------------------------------------");
-
-    // Check balance and approval before proceeding
-    await checkApproval(tokenAddress, tokenABI, poolAddress, signer);
 
     // Approve LINK for the Pool contract
     await approveLinkToken(tokenAddress, tokenABI, amountIn, signer, poolAddress);
@@ -105,14 +103,8 @@ const supplyToken = async (tokenAddress: string, tokenABI: any, tokenDecimal: nu
 }
 
 // Main function
-export const supply = async (amount: string, signer: any, provider: any, token: string) => {
-  const tokenDecimal: number = token == "USDC" ? 6 : 18;
-
-  if (token == "USDC") {
-    const txHash = await supplyToken(tokens.usdcToken.address, TOKEN_IN_ABI, tokenDecimal, amount, provider, signer);
-    return txHash;
-  } else {
-    const txHash = await supplyToken(tokens.chainlinkToken.address, LINK_TOKEN_ABI, tokenDecimal, amount, provider, signer);
-    return txHash;
-  }
+export const supply = async (amount: string, signer: any, provider: any, token: Token) => {
+  
+  const txHash = await supplyToken(token.address, TOKEN_IN_ABI, token.decimal, amount, provider, signer);
+  return txHash;
 }

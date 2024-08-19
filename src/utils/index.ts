@@ -38,12 +38,20 @@ export const getPoolData = async (signer: any) => {
 }
 
 export const getTokensArr = async () => {
-  console.log("Getting tokens array");
   let arr: Token[] = [];
   for(let _token in tokens) {
     const token = tokens[_token]
     arr.push(token);
   }
-  console.log(arr);
   return arr;
 }
+
+// export const reserveBalance = async(provider: any, signer: any, token: Token) => {
+//   console.log("Reserve balance...");
+//   const poolAddress = await getPoolAddress(provider)
+//   const aavePoolContract = new ethers.Contract(poolAddress, AAVE_POOL_ABI, signer);
+
+//   const reserveTokenBalance = await aavePoolContract.getReserveData(token.address);
+
+//   console.log(reserveTokenBalance);
+// }

@@ -19,8 +19,16 @@ const Swap: React.FC = () => {
     console.log('Swapping tokens')
     if(amount && toToken && fromToken) {
       setSwapping(true);
+      // Format the token string
+      console.log(fromToken);
+      const fromTokenString = `${fromToken.toLowerCase()}Token`;
+      const toTokenString = `${toToken.toLowerCase()}Token`;
+
+      // Get the token details
+      const transferFromToken = tokens[fromTokenString];
+      const transferToToken = tokens[toTokenString];
       try {
-        const txHash = await swap(amount, signer, provider);
+        const txHash = await swap(amount, transferFromToken, transferToToken, signer, provider);
         setTransactionHash(txHash);
         setSwapComplete(true);
       } catch (error: any) {
@@ -71,7 +79,7 @@ const Swap: React.FC = () => {
             >
               <option value="">Select a token</option>
               {Object.keys(tokens).map((tokenName, index) => (
-                <option key={index} value={tokens[tokenName].symbol}>{tokens[tokenName].symbol}</option>
+                <option key={index} value={tokens[tokenName].name}>{tokens[tokenName].symbol}</option>
               ))}
             </select>
           </div>
@@ -84,7 +92,7 @@ const Swap: React.FC = () => {
             >
               <option value="">Select a token</option>
               {Object.keys(tokens).map((tokenName, index) => (
-                <option key={index} value={tokens[tokenName].symbol}>{tokens[tokenName].symbol}</option>
+                <option key={index} value={tokens[tokenName].name}>{tokens[tokenName].symbol}</option>
               ))}
             </select>
           </div>

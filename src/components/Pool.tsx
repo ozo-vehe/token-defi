@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react'
 import { getPoolData } from '../utils';
 import { useEthersSigner, useEthersProvider } from "../utils/ethers";
-import { Token, tokens } from '../utils/tokens';
+import { Token } from '../utils/tokens';
 import { withdraw } from '../utils/withdraw';
 import { getTokensArr } from '../utils';
 
@@ -14,8 +14,6 @@ const Pool: FC = () => {
 
   const signer = useEthersSigner();
   const provider = useEthersProvider();
-  console.log("=============  SIGNER  ===================")
-  console.log(signer)
 
   const handleWithdraw = async (aToken: Token) => {
     if (aToken) {
@@ -23,7 +21,7 @@ const Pool: FC = () => {
       const aTokenIndex = aaveTokens.indexOf(aToken);
       const token = tokensArr[aTokenIndex];
       try {
-        console.log(`Withdrawing ${token.name}`);
+        // await reserveBalance(provider, signer, token);
         const txHash = await withdraw(aToken.balance, signer, provider, token);
         setTransactionHash(txHash);
         setWithdrawing("");
@@ -34,7 +32,6 @@ const Pool: FC = () => {
   }
   const getUserPoolData = async () => {
     try {
-      console.log("Getting pool data");
       const poolData = await getPoolData(signer);
       const tokensArr = await getTokensArr();
 

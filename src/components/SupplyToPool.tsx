@@ -15,9 +15,12 @@ const SupplyToPool: React.FC = () => {
 
   const handleSupply = async () => {
     if (token) {
+      const tokenKey = `${token.toLowerCase()}Token`
+      const suppliedToken = tokens[tokenKey];
+
       try {
         setSupplying(true);
-        const txHash = await supply(amount, signer, provider, token);
+        const txHash = await supply(amount, signer, provider, suppliedToken);
         setTransactionHash(txHash);
         setSupplyingComplete(true);
       } catch (error: any) {
@@ -72,7 +75,7 @@ const SupplyToPool: React.FC = () => {
           >
             <option value="">Select a token</option>
             {Object.keys(tokens).map((tokenName, index) => (
-              <option key={index} value={tokens[tokenName].symbol}>{tokens[tokenName].symbol}</option>
+              <option key={index} value={tokens[tokenName].name}>{tokens[tokenName].symbol}</option>
             ))}
           </select>
         </div>
