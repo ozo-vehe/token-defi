@@ -2,7 +2,7 @@
 
 ## Project Introduction
 
-This project demonstration the composability and integration of decentralized finance (DeFi) protocols. The scripts written in this project focuses on two major DeFi platforms: Uniswap and Aave. By leveraging Uniswap for token swapping and Aave for lending, the script showcases a streamlined workflow that allows users to convert tokens(USDC, LINK, DAI, WETH) on Uniswap and immediately utilize the token gotten in Aave’s lending pool to earn interest.
+This project demonstration the composability and integration of decentralized finance (DeFi) protocols. The scripts written in this project focuses on two major DeFi platforms: Uniswap and Aave. By leveraging Uniswap for token swapping and Aave for lending, the script showcases a streamlined workflow that allows users to convert tokens(USDC, LINK) on Uniswap and immediately utilize the token gotten in Aave’s lending pool to earn interest.
 
 ### Review
 Code is deployed at [Token Defi](https://token-defi-tkkb.vercel.app/) for review. Scripts with the functionalities are located in the `utils` folder.
