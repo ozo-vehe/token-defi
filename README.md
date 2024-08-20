@@ -4,6 +4,9 @@
 
 This project demonstration the composability and integration of decentralized finance (DeFi) protocols. The scripts written in this project focuses on two major DeFi platforms: Uniswap and Aave. By leveraging Uniswap for token swapping and Aave for lending, the script showcases a streamlined workflow that allows users to convert tokens(USDC, LINK, DAI, WETH) on Uniswap and immediately utilize the token gotten in Aave’s lending pool to earn interest.
 
+### Review
+Code is deployed at [Token Defi](https://token-defi-tkkb.vercel.app/) for review. Scripts with the functionalities are located in the `utils` folder.
+
 ## Functionalities
 
 ### 1. **Swapping on Uniswap**
@@ -31,6 +34,7 @@ The diagram above illustrates the entire process flow, starting from connecting 
 ## Code Explanation
 
 ### 1. **Swapping tokens on Uniswap**
+   - code can be found in `utils/swap.ts`
    - **Approval Function**: 
      - Before performing the swap, the script calls an `approve` function on the token contract, which allows the Uniswap router contract to spend the user's tokens. 
    - **Swap Function**: 
@@ -39,18 +43,19 @@ The diagram above illustrates the entire process flow, starting from connecting 
      - The script monitors the transaction, ensuring it is confirmed on the blockchain. Once confirmed, the user receives the desired tokens in their wallet.
 
 ### 2. **Supply token to Aave**
+   - code can be found in `utils/supply.ts`
    - **Approval Function**:
      - Similar to the Uniswap interaction, the script first calls an `approve` function on the token's contract, granting the Aave lending pool contract permission to spend the user’s tokens.
    - **Supply Function**:
      - The script then interacts with Aave’s lending pool contract, calling the `supply()` function to supply the token. This function locks the token into the Aave pool, where they start earning interest immediately.
 
 ### 3. **Viewing Supply Pool**
+   - code can be found in `utils/index.ts`
    - **Supply Balance Query**:
-     - The script interacts with Aave’s `getUserReserveData` function to retrieve the current amount of a specific token (in this case, LINK) that has been supplied to the Aave pool by the user. This provides real-time information on the user’s balance within the Aave lending pool.
-
-
+     - The script uses `balanceOf` function to retrieve the current amount of a specific token that has been supplied to the Aave pool by the user. This provides real-time information on the user’s balance within the Aave lending pool.
 
 ### 4. **Withdraw from Aave**
+   - code can be found in `utils/withdraw.ts`
    - **Withdraw Function**:
      - To facilitate the withdrawal, the script calls Aave’s `withdraw` function, specifying the amount of token the user wishes to withdraw. The script checks if the amount is available and then handles the transaction, ensuring the user’s tokens are safely transferred back to their wallet.
 
